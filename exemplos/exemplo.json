@@ -1,0 +1,16 @@
+{
+  "geradoEm": "2024-01-01T00:00:00.000Z",
+  "grupo": {
+    "nome": "Grupo de Exemplo",
+    "jid": "120363xxxxxxxxxxxxxx@g.us",
+    "comunidade": false
+  },
+  "participantes": [
+    { "numero": "5571900000001", "lid": "100000000000001", "nomeAgenda": "Ana Exemplo", "papel": "admin" },
+    { "numero": "5571900000002", "lid": "100000000000002", "nomeAgenda": "Bia Exemplo", "papel": "membro" },
+    { "numero": "5571900000003", "lid": "100000000000003", "nomeAgenda": "", "shortName": "Caio", "papel": "membro" },
+    { "numero": "5571900000004", "lid": "100000000000004", "nomeAgenda": "Duda Exemplo", "papel": "membro" },
+    { "numero": "5571900000005", "lid": "100000000000005", "nomeAgenda": "", "pushname": "edu", "papel": "admin" },
+    { "numero": "5571900000006", "lid": "100000000000006", "nomeAgenda": "Fê Exemplo", "papel": "membro" }
+  ]
+}

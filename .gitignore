@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+membros_*.json
+sorteados*.json
+sorteio*.json
+.env
+.DS_Store
