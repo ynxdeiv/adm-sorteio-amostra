@@ -19,7 +19,7 @@ Sorteio de **<n>** participantes de **<população>** para **<finalidade do estu
 | Grupo | `<nome e id do grupo>` — mantido no arquivo privado |
 | Participantes capturados | `<N>` — todos com número resolvido, sem duplicidade |
 | SHA-256 do arquivo de dados | `<sha256Arquivo>` |
-| Campos utilizados | `numero` (id), `papel`, `contatoSalvo` |
+| Campos utilizados | `papel` e `contatoSalvo` no relatório; o **id de cada participante é a posição dele no arquivo (1..N)**; `numero` só alimenta o mapa privado |
 
 ## 3. População e amostra
 
@@ -34,11 +34,12 @@ Sorteio de **<n>** participantes de **<população>** para **<finalidade do estu
 ## 4. Procedimento
 
 ```bash
-python3 sortear.py --seed <seed> --relatorio sorteio_relatorio.json --anonimizar
+python3 sortear.py --seed <seed> --relatorio sorteio_relatorio.json --mapa sorteio_mapa.json
 ```
 
-Saída: a tabela anonimizada (`P01`…`P32` com papel e contato salvo) e dois arquivos privados
-(`sorteio_relatorio.json` e `sorteio_mapa_<seed>.json`).
+Saída: a tabela com **id (posição no arquivo), papel e contato salvo** — já anônima, porque o id é a
+posição e não o telefone. `sorteio_relatorio.json` guarda a trilha de auditoria (também sem telefone,
+seguro anexar) e `sorteio_mapa.json` guarda id → telefone, que é o único arquivo **privado**.
 
 ## 5. Trilha de auditoria
 
@@ -49,7 +50,7 @@ Saída: a tabela anonimizada (`P01`…`P32` com papel e contato salvo) e dois ar
 | `sha256Universo` | hash da lista de ids elegíveis, na ordem do arquivo |
 | `participantesNoUniverso` | tamanho da moldura amostral |
 | `pedido` | quantos ids foram sorteados |
-| `posicoesNoUniverso` | onde os sorteados estão na lista — evidência de que não são consecutivos |
+| `idsSorteados` | os ids sorteados (posições no arquivo), em ordem — evidência de que não são consecutivos |
 | `sha256Script` | versão exata do código usado |
 | `geradoEm` | data e hora do sorteio (UTC) |
 
@@ -62,7 +63,7 @@ Se `sha256Arquivo` = `<sha256Arquivo>`, `sha256Universo` = `<sha256Universo>` e
    Em seguida contar os participantes: o arquivo deve ter `<N>` registros com número, sem repetição.
 2. **Reprodutibilidade do sorteio:** `python3 sortear.py --json <arquivo> --seed <seed> --anonimizar`
    → deve devolver **os mesmos `P01`…`P32`** (mesmo papel e mesmo contato salvo).
-3. **Conferência contra o relatório:** a tabela anonimizada anexada deve ser idêntica à saída do passo 2.
+3. **Conferência contra o relatório:** a tabela anexada deve ser idêntica à saída do passo 2 — os ids são posições no arquivo, então é possível localizar cada sorteado no JSON sem publicar telefone.
 4. **Dados brutos:** a verificação é feita **na máquina do pesquisador**, com o arquivo privado, sem
    transferência de cópia. Registrar em ata, assinada por quem verificou.
 
@@ -90,17 +91,18 @@ escolhida depois de conhecido o resultado. Mitigações, em ordem de força:
 - **Base legal:** estudos por órgão de pesquisa (art. 7º, IV) ou legítimo interesse (art. 7º, IX),
   documentado — a ser confirmado com o orientador. Não se trata de dado sensível (art. 5º, II),
   salvo se houver cruzamento que revele dado sensível.
-- **Anonimização na divulgação:** no relatório, os participantes aparecem como `P01`…`P32`; o mapa
-  código → telefone fica em arquivo local, sob guarda do pesquisador.
+- **Anonimização na divulgação:** no relatório, cada participante aparece pela **posição no arquivo
+  (1..N)** — não pelo telefone. O mapa `id → telefone` fica em arquivo local, sob guarda do pesquisador.
 - **Segurança e não compartilhamento:** arquivos em máquina local, sem envio para nuvem; o repositório
   público do script **não contém dados** (verificável — só código e documentação).
 - **Atenção específica:** o campo `descricao` do arquivo de dados contém o **link de convite** do grupo;
   se o arquivo circular, qualquer pessoa pode ingressar no grupo. Por isso o arquivo bruto não é anexado.
-- **Retenção:** `<prazo ou evento>` — apagar o arquivo de dados e o mapa de códigos ao final
+- **Retenção:** `<prazo ou evento>` — apagar o arquivo de dados e o mapa `id → telefone` ao final
   (<ex.: conclusão do estudo / publicação>), mantendo apenas a tabela anonimizada e os hashes.
 
 ## 9. Anexos
 
-1. Tabela anonimizada dos sorteados (`P01`…`P32`, papel, contato salvo).
+1. Tabela dos sorteados (id = posição no arquivo, papel, contato salvo).
 2. `sortear.py` e seu `sha256` (`<sha256Script>`).
-3. Hashes e seed (item 5) — o suficiente para auditoria, **sem** os dados pessoais.
+3. `sorteio_relatorio.json` — seed, hashes e ids sorteados; **não contém telefone**, pode ser anexado.
+4. Mantido sob guarda do pesquisador: o arquivo de dados e o mapa `id → telefone`.
