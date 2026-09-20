@@ -1,1 +1,0 @@
-"""Módulos do sorteio."""
