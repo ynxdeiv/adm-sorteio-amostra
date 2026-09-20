@@ -84,8 +84,6 @@ def elegiveis(participantes, campo, papel=None):
 def descrever(valor, participante):
     return {
         "id": valor,
-        "numero": str(participante.get("numero") or ""),
-        "lid": str(participante.get("lid") or ""),
-        "nome": nomeDe(participante),
         "papel": str(participante.get("papel") or ""),
+        "contatoSalvo": bool(participante.get("contatoSalvo")),
     }

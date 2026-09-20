@@ -121,8 +121,7 @@ class TestRegistro(unittest.TestCase):
         self.assertEqual(registro["hashUniverso"], sorteio.hashUniverso(universo))
         self.assertEqual(len(registro["sorteados"]), 2)
         for item in registro["sorteados"]:
-            self.assertIn("numero", item)
-            self.assertIn("nome", item)
+            self.assertEqual(set(item), {"id", "papel", "contatoSalvo"})
 
 
 class TestLinhaDeComando(unittest.TestCase):
@@ -135,8 +134,8 @@ class TestLinhaDeComando(unittest.TestCase):
         )
 
     def test_apenas_ids_e_repetivel(self):
-        primeira = self.rodar("--json", str(EXEMPLO), "-n", "3", "--seed", "7", "--apenas-ids")
-        segunda = self.rodar("--json", str(EXEMPLO), "-n", "3", "--seed", "7", "--apenas-ids")
+        primeira = self.rodar("--json", str(EXEMPLO), "-n", "3", "--seed", "7", "--formato", "ids")
+        segunda = self.rodar("--json", str(EXEMPLO), "-n", "3", "--seed", "7", "--formato", "ids")
         self.assertEqual(primeira.returncode, 0)
         self.assertEqual(primeira.stdout, segunda.stdout)
         self.assertEqual(len(primeira.stdout.split()), 3)
@@ -161,17 +160,36 @@ class TestLinhaDeComando(unittest.TestCase):
         self.assertEqual(self.rodar("--json", "/nao/existe.json", "-n", "1").returncode, 2)
 
 
-    def test_padrao_lista_id_e_papel(self):
+    def test_tabela_padrao_traz_id_papel_e_contato_salvo(self):
         resultado = self.rodar("--json", str(EXEMPLO), "-n", "3", "--seed", "3")
         self.assertEqual(resultado.returncode, 0)
-        itens = [linha for linha in resultado.stdout.splitlines() if linha.strip()[:1].isdigit()]
-        self.assertEqual(len(itens), 3)
-        for linha in itens:
-            identificador, _, papel = linha.partition("—")
-            self.assertTrue(identificador.split(".")[1].strip().startswith("5571"))
-            self.assertIn(papel.strip(), ("membro", "admin"))
-            self.assertNotIn("·", linha)
+        self.assertIn("Contato salvo", resultado.stdout)
         self.assertIn("Resumo..:", resultado.stdout)
+        linhas = [linha for linha in resultado.stdout.splitlines() if linha.strip()[:1].isdigit()]
+        self.assertEqual(len(linhas), 3)
+        for linha in linhas:
+            colunas = linha.split()
+            self.assertTrue(colunas[1].startswith("5571"))
+            self.assertIn(colunas[2], ("membro", "admin"))
+            self.assertIn(colunas[3], ("Sim", "Não"))
+
+    def test_formato_json_traz_id_papel_e_contato_salvo(self):
+        resultado = self.rodar("--json", str(EXEMPLO), "-n", "3", "--seed", "3", "--formato", "json")
+        self.assertEqual(resultado.returncode, 0)
+        sorteados = json.loads(resultado.stdout)
+        self.assertEqual(len(sorteados), 3)
+        for item in sorteados:
+            self.assertEqual(set(item), {"id", "papel", "contatoSalvo"})
+            self.assertIsInstance(item["contatoSalvo"], bool)
+            self.assertIn(item["papel"], ("membro", "admin"))
+
+    def test_salvar_usa_os_mesmos_campos(self):
+        with tempfile.TemporaryDirectory() as pasta:
+            destino = Path(pasta) / "sorteio.json"
+            self.rodar("--json", str(EXEMPLO), "-n", "2", "--seed", "1", "--salvar", str(destino))
+            registro = json.loads(destino.read_text(encoding="utf-8"))
+            self.assertEqual(set(registro["sorteados"][0]), {"id", "papel", "contatoSalvo"})
+            self.assertEqual(registro["seed"], 1)
 
     def test_detalhado_inclui_lid_e_nome(self):
         resultado = self.rodar("--json", str(EXEMPLO), "-n", "1", "--seed", "3", "--detalhado")
@@ -181,7 +199,7 @@ class TestLinhaDeComando(unittest.TestCase):
         self.assertIn("·", itens[0])
 
     def test_filtro_por_papel_na_linha_de_comando(self):
-        resultado = self.rodar("--json", str(EXEMPLO), "--papel", "admin", "-n", "2", "--seed", "5", "--apenas-ids")
+        resultado = self.rodar("--json", str(EXEMPLO), "--papel", "admin", "-n", "2", "--seed", "5", "--formato", "ids")
         self.assertEqual(resultado.returncode, 0)
         self.assertEqual(len(resultado.stdout.split()), 2)
 
