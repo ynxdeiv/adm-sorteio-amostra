@@ -20,6 +20,7 @@ python3 sortear.py                          # 32 ids pelo campo `numero`
 python3 sortear.py --n 5 --campo lid        # sorteia LIDs em vez de telefones
 python3 sortear.py --papel admin            # sorteia só entre os administradores
 python3 sortear.py --seed 20240911          # repete exatamente um sorteio anterior
+python3 sortear.py --detalhado              # mostra também lid e nome
 python3 sortear.py --apenas-ids > sorteados.txt
 python3 sortear.py --salvar sorteio.json    # grava o registro (seed + hash + sorteados)
 ```
@@ -31,10 +32,13 @@ Universo: 1023 ids elegíveis pelo campo 'numero' (papel: todos)
 Arquivo.: /caminho/membros_ic.json
 Seed....: 12345678901234567890
 Hash....: 4f2a9c1b7e8d3a05  (universo, na ordem do arquivo)
+Resumo..: 32 sorteados — 30 membros · 2 admins
 
-   1. 5571900000001 · 100000000000001 · Ana Exemplo · admin
-   2. 5571900000002 · 100000000000002 · Bia Exemplo · membro
+   1. 5571900000001 — admin
+   2. 5571900000002 — membro
 ```
+
+Cada linha traz o **id e o papel** (membro/admin). Com `--detalhado`, a linha também traz lid e nome.
 
 O JSON de entrada é procurado nesta ordem: `--json`, `./membros_ic.json`, `~/Documents/whatsapp-scrap/saida/membros_ic.json`, `~/Desktop/membros_ic.json`.
 
@@ -47,6 +51,7 @@ O JSON de entrada é procurado nesta ordem: `--json`, `./membros_ic.json`, `~/Do
 | `--campo {numero,lid}` | `numero` | Campo usado como id do participante |
 | `--papel PAPEL` | todos | Sorteia só entre quem tem esse `papel` (ex.: `admin`) |
 | `--seed N` | aleatória | Semente para repetir um sorteio |
+| `--detalhado` | desligado | Mostra também lid e nome, além do id e do papel |
 | `--apenas-ids` | desligado | Imprime só os ids, um por linha (bom para copiar/colar) |
 | `--salvar CAMINHO` | não grava | Grava o resultado em JSON, com seed e hash |
 
@@ -75,7 +80,7 @@ Participantes sem o campo escolhido (ou repetido) são ignorados: o universo é 
 1. Lê o JSON e monta o universo de ids distintos, na ordem do arquivo.
 2. Aplica o filtro de `--papel`, se houver.
 3. Sorteia com `random.Random(seed).sample(...)` — amostra **uniforme e sem reposição** (ninguém sai duas vezes).
-4. Imprime o resultado e, com `--salvar`, grava o registro.
+4. Imprime o id e o papel de cada sorteado (o papel sai do campo `papel` do JSON) e, com `--salvar`, grava o registro.
 
 ## Auditoria
 
@@ -94,7 +99,7 @@ adm-sorteio-amostra/
 │   ├── dados.py            # acha e lê o JSON, monta o universo de elegíveis
 │   └── sorteio.py          # sorteio e registro de auditoria
 ├── testes/
-│   └── test_sorteio.py     # 17 testes (unittest, sem dependências)
+│   └── test_sorteio.py     # 20 testes (unittest, sem dependências)
 ├── exemplos/
 │   └── exemplo.json        # JSON sintético, para testar sem dado real
 ├── LICENSE

@@ -161,5 +161,30 @@ class TestLinhaDeComando(unittest.TestCase):
         self.assertEqual(self.rodar("--json", "/nao/existe.json", "-n", "1").returncode, 2)
 
 
+    def test_padrao_lista_id_e_papel(self):
+        resultado = self.rodar("--json", str(EXEMPLO), "-n", "3", "--seed", "3")
+        self.assertEqual(resultado.returncode, 0)
+        itens = [linha for linha in resultado.stdout.splitlines() if linha.strip()[:1].isdigit()]
+        self.assertEqual(len(itens), 3)
+        for linha in itens:
+            identificador, _, papel = linha.partition("—")
+            self.assertTrue(identificador.split(".")[1].strip().startswith("5571"))
+            self.assertIn(papel.strip(), ("membro", "admin"))
+            self.assertNotIn("·", linha)
+        self.assertIn("Resumo..:", resultado.stdout)
+
+    def test_detalhado_inclui_lid_e_nome(self):
+        resultado = self.rodar("--json", str(EXEMPLO), "-n", "1", "--seed", "3", "--detalhado")
+        itens = [linha for linha in resultado.stdout.splitlines() if linha.strip().startswith("1.")]
+        self.assertEqual(len(itens), 1)
+        self.assertIn("100000000000", itens[0])
+        self.assertIn("·", itens[0])
+
+    def test_filtro_por_papel_na_linha_de_comando(self):
+        resultado = self.rodar("--json", str(EXEMPLO), "--papel", "admin", "-n", "2", "--seed", "5", "--apenas-ids")
+        self.assertEqual(resultado.returncode, 0)
+        self.assertEqual(len(resultado.stdout.split()), 2)
+
+
 if __name__ == "__main__":
     unittest.main()
