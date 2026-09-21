@@ -28,7 +28,7 @@ Amostra uniforme e sem repetição (`random.sample`): cada subconjunto de `n` te
 
 ## Auditoria
 
-`--relatorio` grava seed, SHA-256 do arquivo, SHA-256 da lista de ids, tamanho do universo, os ids sorteados e o SHA-256 do próprio script — dá para refazer o sorteio e conferir a integridade do arquivo. O passo a passo está no `METODOLOGIA.md`.
+`--relatorio` grava um documento **pronto para anexar**: data, tamanho do universo, quantidade, método de amostragem, seed, SHA-256 do arquivo / da lista de ids / do script, os ids sorteados e uma declaração de que não contém dados pessoais. Com ele dá para refazer o sorteio e conferir a integridade do arquivo — o passo a passo está no `METODOLOGIA.md`.
 
 ## Formato do JSON
 

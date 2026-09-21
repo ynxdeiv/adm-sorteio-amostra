@@ -53,6 +53,10 @@ seguro anexar) e `sorteio_mapa.json` guarda id → telefone, que é o único arq
 | `idsSorteados` | os ids sorteados (posições no arquivo), em ordem — evidência de que não são consecutivos |
 | `sha256Script` | versão exata do código usado |
 | `geradoEm` | data e hora do sorteio (UTC) |
+| `metodo` | amostragem aleatória simples, sem reposição |
+| `algoritmoDeResumo` | SHA-256 |
+| `comandoParaReproduzir` | comando que refaz o sorteio a partir do arquivo e da seed |
+| `confidencialidade` | declaração de que o arquivo não contém dados pessoais |
 
 ## 6. Protocolo de verificação
 

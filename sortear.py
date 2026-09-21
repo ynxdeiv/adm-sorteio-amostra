@@ -105,15 +105,25 @@ def main():
     if args.relatorio:
         registro = {
             "geradoEm": datetime.now(timezone.utc).isoformat(),
-            "arquivo": str(caminho),
-            "sha256Arquivo": sha256(conteudo),
-            "sha256Universo": sha256("|".join(item["telefone"] for item in participantes).encode()),
+            "arquivoOrigem": Path(caminho).name,
             "participantesNoUniverso": len(participantes),
             "pedido": args.n,
+            "metodo": "amostragem aleatória simples, sem reposição (random.sample)",
+            "algoritmoDeResumo": "SHA-256",
             "seed": seed,
+            "sha256Arquivo": sha256(conteudo),
+            "sha256Universo": sha256("|".join(item["telefone"] for item in participantes).encode()),
             "sha256Script": sha256(Path(__file__).read_bytes()),
+            "comandoParaReproduzir": f"python3 sortear.py --json <arquivo> --seed {seed}",
             "idsSorteados": sorted(item["id"] for item in sorteados),
             "sorteados": [publico(item) for item in sorteados],
+            "confidencialidade": {
+                "dadosPessoaisNesteArquivo": False,
+                "identificadores": "posições (1..N) no arquivo de origem, na ordem em que os participantes aparecem",
+                "arquivoDeOrigem": "mantido sob guarda do pesquisador; não anexado",
+                "mapaIdTelefone": "arquivo separado e privado; não anexado",
+                "observacao": "os hashes permitem verificar integridade e refazer o sorteio sem revelar os dados",
+            },
         }
         print(f"\n>> relatorio (seguro anexar): {gravar(args.relatorio, registro)}")
 
