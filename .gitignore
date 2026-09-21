@@ -2,6 +2,8 @@ __pycache__/
 *.py[cod]
 membros_*.json
 sorteio*.json
+sorteio*.tsv
+sorteio*.csv
 sorteados*.json
 relatorio*.json
 mapa*.json
